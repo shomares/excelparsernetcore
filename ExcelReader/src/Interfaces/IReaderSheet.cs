@@ -6,6 +6,6 @@ namespace ExcelReader.src.Interfaces
 {
     internal interface IReaderSheet
     {
-        Task<IEnumerable<FileRowInfoExcel>> ReadSheetAsync(string sheetPartName, string[] strings, ZipArchive zipArchive);
+        IEnumerable<FileRowInfoExcel> ReadSheet(string sheetPartName, string[] strings, ZipArchive zipArchive);
     }
 }

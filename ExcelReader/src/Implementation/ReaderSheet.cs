@@ -8,7 +8,7 @@ namespace ExcelReader.src.Implementation
     internal class ReaderSheet : IReaderSheet
     {
 
-        public async Task<IEnumerable<FileRowInfoExcel>> ReadSheetAsync(string sheetPartName, string[] strings, ZipArchive zipArchive)
+        public IEnumerable<FileRowInfoExcel> ReadSheet(string sheetPartName, string[] strings, ZipArchive zipArchive)
         {
             var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == sheetPartName.TrimStart('/'));
             if (entry == null)
@@ -24,8 +24,6 @@ namespace ExcelReader.src.Implementation
         {
             var currentElement = string.Empty;
             var elements = new Stack<string>();
-
-            var rowName = "row";
 
             while (!bytes.EndOfStream)
             {
@@ -43,17 +41,7 @@ namespace ExcelReader.src.Implementation
                         }
                     }
 
-
-                    //read the parameters
-                    if (currentElement == rowName)
-                    {
-                        while (!bytes.EndOfStream && c == "\"")
-                        {
-
-                        }
-
-                    }
-
+                 
 
                     while (!bytes.EndOfStream && c != '>')
                     {

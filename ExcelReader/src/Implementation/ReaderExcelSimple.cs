@@ -27,7 +27,7 @@ namespace ExcelReader.src.Implementation
 
            
 
-            foreach (var row in await readerSheet.ReadSheetAsync(firstSheetPage.PartName, strings, zipArchive))
+            foreach (var row in  readerSheet.ReadSheet(firstSheetPage.PartName, strings, zipArchive))
             {
                 Console.WriteLine(row.R);
             }
