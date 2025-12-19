@@ -4,8 +4,8 @@ using System.IO.Compression;
 
 namespace ExcelReader.src.Interfaces
 {
-    internal interface IReaderSheet
+    internal interface IReaderSheet: IDisposable
     {
-        IEnumerable<FileRowInfoExcel> ReadSheet(string sheetPartName, string[] strings, ZipArchive zipArchive);
+        IEnumerable<FileRowInfoExcel> ReadSheet(string sheetPartName, ZipArchive zipArchive);
     }
 }

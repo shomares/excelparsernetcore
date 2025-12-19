@@ -11,4 +11,10 @@
     <ProjectReference Include="..\ExcelReader\ExcelReader.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Example.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

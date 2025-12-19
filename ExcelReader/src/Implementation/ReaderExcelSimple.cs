@@ -7,12 +7,11 @@ namespace ExcelReader.src.Implementation
     public class ReaderExcelSimple : IReaderRow
     {
 
-        private readonly ReaderFileSimple readerFileZip = new ReaderFileSimple();
-        private readonly ReadStrings readStrings = new ReadStrings();
-        private readonly ReaderSheet readerSheet = new ReaderSheet();
+        private readonly ReaderFileSimple readerFileZip = new();
+        private readonly ReadStrings readStrings = new();
 
 
-        public async Task<IDictionary<string, object>> GetNextRowAsync(string fileName)
+        public async Task<IDictionary<string, object>> GetNextRowAsync(string fileName, string sheetName)
         {
             await using var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             using var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
@@ -21,15 +20,17 @@ namespace ExcelReader.src.Implementation
 
             var stringsFile = indexValues.FirstOrDefault(it => it.PartName == "/xl/sharedStrings.xml") ?? throw new Exception("Shared strings file not found in the Excel archive.");
             var strings = await readStrings.ReadStringsAsync(stringsFile, zipArchive);
+            using ReaderSheet readerSheet = new();
+            var firstSheetPage = indexValues.FirstOrDefault(it => it.PartName == $"/xl/worksheets/{sheetName}.xml") ?? throw new Exception("Shared strings file not found in the Excel archive.");
 
-
-            var firstSheetPage = indexValues.FirstOrDefault(it => it.PartName == "/xl/worksheets/sheet1.xml") ?? throw new Exception("Shared strings file not found in the Excel archive.");
-
-           
-
-            foreach (var row in  readerSheet.ReadSheet(firstSheetPage.PartName, strings, zipArchive))
+            if (firstSheetPage == null)
             {
-                Console.WriteLine(row.R);
+                throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
+            }
+
+            foreach (var row in readerSheet.ReadSheet(firstSheetPage.PartName, zipArchive))
+            {
+                Console.WriteLine(row.Parameters);
             }
 
 

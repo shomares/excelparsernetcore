@@ -2,6 +2,6 @@
 {
     internal interface IReaderRow
     {
-        Task<IDictionary<string, object>> GetNextRowAsync(string file);
+        Task<IDictionary<string, object>> GetNextRowAsync(string file, string sheetName);
     }
 }
