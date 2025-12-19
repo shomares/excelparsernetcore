@@ -4,9 +4,9 @@ using System.IO.Compression;
 
 namespace ExcelReader.src.Interfaces
 {
-    internal interface IReadStrings
+    internal interface IReadStrings: IDisposable
     {
 
-        public Task<string[]> ReadStringsAsync(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
+        public IEnumerable<string> GetStrings(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
     }
 }
