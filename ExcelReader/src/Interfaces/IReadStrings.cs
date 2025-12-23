@@ -7,6 +7,8 @@ namespace ExcelReader.src.Interfaces
     internal interface IReadStrings: IDisposable
     {
 
-        public IEnumerable<string> GetStrings(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
+        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
+
+        public string GetStringByIndex(int index);
     }
 }

@@ -10,8 +10,9 @@ namespace ExcelReader.src.Implementation
     /// </summary>
     internal class StreamReadStrings : IReadStrings
     {
-        private Stream? entryStream;
-        private StreamReader? streamReader;
+        private FileStream? entryStream;
+        private List<long>? positions;
+        private string? temporaryFile;
         private bool disposedValue;
 
         /// <summary>
@@ -20,19 +21,20 @@ namespace ExcelReader.src.Implementation
         /// <param name="fileInfoExcel">File info excel</param>
         /// <param name="zipArchive">Zip file archive</param>
         /// <returns>Collection string, string by string</returns>
-        public IEnumerable<string> GetStrings(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
+        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
         {
             var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == fileInfoExcel.PartName?.TrimStart('/'));
 
             if (entry == null)
             {
-                return [];
+                return;
             }
 
-            var response = new List<string>();
-            entryStream = entry.Open();
-            streamReader = new StreamReader(entryStream);
-            return ParseContent(streamReader);
+            temporaryFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            entry.ExtractToFile(temporaryFile);
+
+            entryStream = File.OpenRead(temporaryFile);
+            ParseContent(entryStream);
         }
 
 
@@ -41,19 +43,19 @@ namespace ExcelReader.src.Implementation
         /// </summary>
         /// <param name="bytes">Reading it as stream</param>
         /// <returns>A collection string, strings by string</returns>
-        private static IEnumerable<string> ParseContent(StreamReader bytes)
+        private void ParseContent(FileStream fs)
         {
+            positions = [];
             var currentElement = new StringBuilder();
-
-            while (!bytes.EndOfStream)
+            while (fs.Position < fs.Length)
             {
-                var c = (char)bytes.Read();
+                var c = fs.ReadChar();
 
                 if (c == '<')
                 {
-                    while (!bytes.EndOfStream && c != ' ' && c != '>')
+                    while (fs.Position < fs.Length && c != ' ' && c != '>')
                     {
-                        c = (char)bytes.Read();
+                        c = fs.ReadChar();
 
                         if (c != '>' && c != ' ')
                         {
@@ -63,24 +65,20 @@ namespace ExcelReader.src.Implementation
 
                     var currentElementStr = currentElement.ToString();
 
-                    //Read t properties
                     if (currentElementStr == "t")
                     {
-                        var value = ReaderValues.ReadValue(bytes);
-                        yield return value;
-                    }
-                    else
-                    {
-                        while (!bytes.EndOfStream && c != '>')
-                        {
-                            c = (char)bytes.Read();
-                        }
+                        positions.Add(fs.Position);
                     }
 
+                    while (fs.Position < fs.Length && c != '>')
+                    {
+                        c = fs.ReadChar();
+                    }
+
+                    //Read t properties
                     currentElement.Clear();
                 }
             }
-
         }
 
         /// <summary>
@@ -94,9 +92,13 @@ namespace ExcelReader.src.Implementation
                 if (disposing)
                 {
                     entryStream?.Dispose();
-                    streamReader?.Dispose();
-                }
+                    positions?.Clear();
 
+                    if (temporaryFile != null && File.Exists(temporaryFile))
+                    {
+                        File.Delete(temporaryFile);
+                    }
+                }
                 disposedValue = true;
             }
         }
@@ -108,6 +110,25 @@ namespace ExcelReader.src.Implementation
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Get value from xml file by index
+        /// </summary>
+        /// <param name="index">Index of the string</param>
+        /// <returns>A string by index</returns>
+        public string GetStringByIndex(int index)
+        {
+
+            if (entryStream == null || positions == null || positions.Count == 0)
+            {
+                throw new InvalidOperationException("Stream is not initialized or no positions found.");
+            }
+
+            entryStream.Seek(positions[index], SeekOrigin.Begin);
+            var value = entryStream.ReadValue();
+            return value;
+
         }
     }
 }
