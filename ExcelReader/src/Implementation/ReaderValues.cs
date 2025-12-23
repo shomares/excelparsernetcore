@@ -30,26 +30,6 @@ namespace ExcelReader.src.Implementation
             return result.ToString();
         }
 
-
-        public static string ReadValue(this FileStream bytes)
-        {
-            char? c = null;
-            var result = new StringBuilder();
-            do
-            {
-                c = bytes.ReadChar();
-
-                if (c == '<')
-                {
-                    break;
-                }
-
-                result.Append(c);
-            } while (c != '\0' && c != '<');
-
-            return result.ToString();
-        }
-
         /// <summary>
         /// Read parameters inside a tag like <c r="A1" t="s">
         /// </summary>
@@ -93,31 +73,6 @@ namespace ExcelReader.src.Implementation
             }
 
             return parameters;
-        }
-
-        public static char ReadChar(this FileStream fs)
-        {
-            var decoder = Encoding.UTF8.GetDecoder();
-            byte[] bytes = new byte[4];   // UTF-8 max bytes per char
-            char[] chars = new char[1];
-
-
-            int read = fs.Read(bytes, 0, 1);
-            if (read == 0)
-            {
-                return '\0';
-            }
-
-
-            decoder.Convert(
-                bytes, 0, read,
-                chars, 0, 1,
-                false,
-                out _, out int charsUsed, out _
-            );
-
-            return charsUsed > 0 ? chars[0] : '\0';
-
         }
     }
 }
