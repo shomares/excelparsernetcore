@@ -1,7 +1,7 @@
 ﻿using ExcelReader.src.Entity;
 using ExcelReader.src.Interfaces;
 using System.IO.Compression;
-using System.Text;
+using System.Xml;
 
 namespace ExcelReader.src.Implementation
 {
@@ -11,7 +11,6 @@ namespace ExcelReader.src.Implementation
     internal class MemoryReadStrings : IReadStrings
     {
         private Stream? entryStream;
-        private StreamReader? streamReader;
         private bool disposedValue;
         private List<string>? values = [];
 
@@ -28,7 +27,6 @@ namespace ExcelReader.src.Implementation
                 if (disposing)
                 {
                     entryStream?.Dispose();
-                    streamReader?.Dispose();
                     values?.Clear();
                     values = null;
                 }
@@ -55,44 +53,22 @@ namespace ExcelReader.src.Implementation
                 return;
             }
 
-            var response = new List<string>();
-            entryStream = entry.Open();
-            streamReader = new StreamReader(entryStream);
             values = [];
-            var currentElement = new StringBuilder();
 
-            while (!streamReader.EndOfStream)
+            entryStream = entry.Open();
+         
+            using var xml = XmlReader.Create(entryStream, new XmlReaderSettings
             {
-                var c = (char)streamReader.Read();
+                IgnoreComments = true,
+                IgnoreWhitespace = true
+            });
 
-                if (c == '<')
+            while (xml.Read())
+            {
+                if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
                 {
-                    while (!streamReader.EndOfStream && c != ' ' && c != '>')
-                    {
-                        c = (char)streamReader.Read();
-
-                        if (c != '>' && c != ' ')
-                        {
-                            currentElement.Append(c);
-                        }
-                    }
-
-                    var currentElementStr = currentElement.ToString();
-
-                    while (!streamReader.EndOfStream && c != '>')
-                    {
-                        c = (char)streamReader.Read();
-                    }
-
-                    //Read t properties
-                    if (currentElementStr == "t")
-                    {
-                        var value = ReaderValues.ReadValue(streamReader);
-                        values?.Add(value);
-                    }
-
-
-                    currentElement.Clear();
+                    string value = xml.ReadElementContentAsString();
+                    values.Add(value);
                 }
             }
         }

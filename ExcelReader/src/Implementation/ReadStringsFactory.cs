@@ -13,7 +13,7 @@ namespace ExcelReader.src.Implementation
             double fileSizeInMB = (double)fileSizeInBytes / (1024 * 1024);
 
 
-            return fileSizeInMB > 10000
+            return fileSizeInMB > 1
                 ? new StreamReadStrings()
                 : new MemoryReadStrings();
         }

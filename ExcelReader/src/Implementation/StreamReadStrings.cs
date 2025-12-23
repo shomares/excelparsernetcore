@@ -2,6 +2,7 @@
 using ExcelReader.src.Interfaces;
 using System.IO.Compression;
 using System.Text;
+using System.Xml;
 
 namespace ExcelReader.src.Implementation
 {
@@ -14,72 +15,43 @@ namespace ExcelReader.src.Implementation
         private List<long>? positions;
         private string? temporaryFile;
         private bool disposedValue;
-
-        /// <summary>
-        /// Read string values from sharedStrings.xml file, using streaming in order to reduce memory consumption
-        /// </summary>
-        /// <param name="fileInfoExcel">File info excel</param>
-        /// <param name="zipArchive">Zip file archive</param>
-        /// <returns>Collection string, string by string</returns>
+    
         public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
         {
-            var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == fileInfoExcel.PartName?.TrimStart('/'));
+            if (fileInfoExcel.PartName == null)
+            {
+                return;
+            }
 
+            positions = [];
+            temporaryFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".bin");
+            entryStream = new FileStream(temporaryFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+
+            var entry = zipArchive.GetEntry(fileInfoExcel.PartName.TrimStart('/'));
             if (entry == null)
             {
                 return;
             }
 
-            temporaryFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            entry.ExtractToFile(temporaryFile);
-
-            entryStream = File.OpenRead(temporaryFile);
-            ParseContent(entryStream);
-        }
-
-
-        /// <summary>
-        /// Parse content of sharedStrings.xml file, reading it as a stream
-        /// </summary>
-        /// <param name="bytes">Reading it as stream</param>
-        /// <returns>A collection string, strings by string</returns>
-        private void ParseContent(FileStream fs)
-        {
-            positions = [];
-            var currentElement = new StringBuilder();
-            while (fs.Position < fs.Length)
+            using var xml = XmlReader.Create(entry.Open(), new XmlReaderSettings
             {
-                var c = fs.ReadChar();
+                IgnoreComments = true,
+                IgnoreWhitespace = true
+            });
 
-                if (c == '<')
+            using var writer = new BinaryWriter(entryStream, Encoding.UTF8, leaveOpen: true);
+
+            while (xml.Read())
+            {
+                if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
                 {
-                    while (fs.Position < fs.Length && c != ' ' && c != '>')
-                    {
-                        c = fs.ReadChar();
-
-                        if (c != '>' && c != ' ')
-                        {
-                            currentElement.Append(c);
-                        }
-                    }
-
-                    var currentElementStr = currentElement.ToString();
-
-                    if (currentElementStr == "t")
-                    {
-                        positions.Add(fs.Position);
-                    }
-
-                    while (fs.Position < fs.Length && c != '>')
-                    {
-                        c = fs.ReadChar();
-                    }
-
-                    //Read t properties
-                    currentElement.Clear();
+                    positions.Add(entryStream.Position);
+                    string value = xml.ReadElementContentAsString();
+                    writer.Write(value);
                 }
             }
         }
+
 
         /// <summary>
         /// Dispose pattern implementation
@@ -93,6 +65,7 @@ namespace ExcelReader.src.Implementation
                 {
                     entryStream?.Dispose();
                     positions?.Clear();
+                    entryStream?.Dispose();
 
                     if (temporaryFile != null && File.Exists(temporaryFile))
                     {
@@ -126,9 +99,8 @@ namespace ExcelReader.src.Implementation
             }
 
             entryStream.Seek(positions[index], SeekOrigin.Begin);
-            var value = entryStream.ReadValue();
-            return value;
-
+            using var reader = new BinaryReader(entryStream, Encoding.UTF8, leaveOpen: true);
+            return reader.ReadString();
         }
     }
 }
