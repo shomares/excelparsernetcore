@@ -47,7 +47,7 @@ namespace ExcelReader.src.Implementation
                 if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
                 {
                     positions.Add(entryStream.Position);
-                    string value = await xml.ReadContentAsStringAsync();
+                    string value = await xml.ReadElementContentAsStringAsync();
                     writer.Write(value);
                 }
             }

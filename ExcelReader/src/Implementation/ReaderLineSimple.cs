@@ -1,11 +1,13 @@
 ﻿using ExcelReader.src.Entity;
 using ExcelReader.src.Interfaces;
 using System.Dynamic;
+using System.Globalization;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace ExcelReader.src.Implementation
 {
-    internal class ReaderLineSimple(IReadStrings readStrings) : IReaderLine
+    internal class ReaderLineSimple(IReadStrings readStrings, IReaderStyles readerStyles) : IReaderLine
     {
 
         /// <summary>
@@ -25,38 +27,64 @@ namespace ExcelReader.src.Implementation
 
                 var value = GetValue(column);
 
-                columns.Add(r, value ?? r);
+                if (value == null)
+                {
+                    columns.Add(r, r);
+                }
+                else
+                {
+                    columns.Add(r, value.ToString() ?? r);
+                }
 
             }
 
             return columns;
         }
 
-        private string? GetValue(FileColumnInfoExcel column)
+        private object? GetValue(FileColumnInfoExcel column)
         {
             if (column.V == null)
             {
                 return null;
             }
 
-
-            if (column.Parameters != null && column.Parameters.TryGetValue("t", out var typeValue) && typeValue == "s")
+            if (column.V == "NULL" || column.V == "null")
             {
-                if (int.TryParse(column.V, out var stringIndex))
-                {
-                    var stringValue = readStrings.GetStringByIndex(stringIndex);
-                    return stringValue;
-                }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
-            else
+
+            if (column.Parameters == null)
             {
                 return column.V;
             }
 
+            if (column.Parameters.TryGetValue("t", out var typeValue))
+            {
+                if (typeValue == "s" && int.TryParse(column.V, out var stringIndex))
+                {
+                    var stringValue = readStrings.GetStringByIndex(stringIndex);
+                    return stringValue;
+                }
+                else if (typeValue == "n")
+                {
+                    return decimal.Parse(column.V);
+                }
+            }
+
+            else if (column.Parameters.TryGetValue("s", out var style) && int.TryParse(style, out var indexS))
+            {
+                var styleA = readerStyles.GetCellStyle(indexS);
+                double oaDate = double.Parse(column.V, CultureInfo.InvariantCulture);
+                if (styleA != null && styleA.IsDate)
+                {
+
+                    return DateTime.FromOADate(oaDate);
+                }
+
+                return oaDate;
+            }
+
+            return column.V;
         }
 
 
@@ -102,7 +130,7 @@ namespace ExcelReader.src.Implementation
                 if (columns.TryGetValue(r, out var columnsPropertyName))
                 {
 #pragma warning disable CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
-                    var dict = (IDictionary<string, object>)result;
+                    var dict = (IDictionary<string, object?>)result;
 #pragma warning restore CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
                     var value = GetValue(column);
                     dict.Add(columnsPropertyName, value ?? string.Empty);

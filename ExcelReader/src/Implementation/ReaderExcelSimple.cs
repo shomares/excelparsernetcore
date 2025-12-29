@@ -18,6 +18,7 @@ namespace ExcelReader.src.Implementation
         private FileInfoExcel? firstSheetPage;
         private ZipArchive? zipArchive;
         private FileStream? fileStream;
+        private ReaderStyles? readerStyles;
 
         public IEnumerable<dynamic> GetNextRow()
         {
@@ -31,9 +32,14 @@ namespace ExcelReader.src.Implementation
                 throw new Exception("ReadStrings is not initialized. You must call ReadFileAsync before reading rows.");
             }
 
+            if (readerStyles == null)
+            {
+                throw new Exception("ReaderStyles is not initialized. You must call ReadFileAsync before reading rows.");
+            }
+
             long index = 0;
 
-            var readerRow = new ReaderLineSimple(readStrings);
+            var readerRow = new ReaderLineSimple(readStrings, readerStyles);
             var values = readerSheet.ReadSheet(firstSheetPage.PartName, zipArchive);
             IDictionary<string, string>? columns = null;
 
@@ -63,12 +69,16 @@ namespace ExcelReader.src.Implementation
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
 
+            readerStyles = new ReaderStyles();
 
             readStrings = readStringsFactory.CreateReadStrings(fileName);
             await readStrings.LoadInfoAsync(new FileInfoExcel
             {
                 PartName = "/xl/sharedStrings.xml"
             }, zipArchive);
+
+
+            readerStyles.LoadInfo(zipArchive);
             var indexValues = zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/{sheetName}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
 
             if (indexValues != null)
@@ -86,6 +96,8 @@ namespace ExcelReader.src.Implementation
             {
                 if (disposing)
                 {
+
+                    readerStyles?.Dispose();
                     readStrings?.Dispose();
                     readerSheet.Dispose();
                     zipArchive?.Dispose();
