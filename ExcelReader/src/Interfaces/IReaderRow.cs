@@ -1,6 +1,6 @@
 ﻿namespace ExcelReader.src.Interfaces
 {
-    internal interface IReaderRow: IDisposable
+    internal interface IReaderRow : IDisposable
     {
         IEnumerable<dynamic> GetNextRow();
 

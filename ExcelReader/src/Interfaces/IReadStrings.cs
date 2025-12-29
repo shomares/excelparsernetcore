@@ -7,7 +7,7 @@ namespace ExcelReader.src.Interfaces
     internal interface IReadStrings: IDisposable
     {
 
-        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
+        public Task LoadInfoAsync(FileInfoExcel fileInfoExcel, ZipArchive zipArchive);
 
         public string GetStringByIndex(int index);
     }

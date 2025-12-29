@@ -15,8 +15,8 @@ namespace ExcelReader.src.Implementation
         private List<long>? positions;
         private string? temporaryFile;
         private bool disposedValue;
-    
-        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
+
+        public async Task LoadInfoAsync(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
         {
             if (fileInfoExcel.PartName == null)
             {
@@ -36,7 +36,8 @@ namespace ExcelReader.src.Implementation
             using var xml = XmlReader.Create(entry.Open(), new XmlReaderSettings
             {
                 IgnoreComments = true,
-                IgnoreWhitespace = true
+                IgnoreWhitespace = true,
+                Async = true,
             });
 
             using var writer = new BinaryWriter(entryStream, Encoding.UTF8, leaveOpen: true);
@@ -46,7 +47,7 @@ namespace ExcelReader.src.Implementation
                 if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
                 {
                     positions.Add(entryStream.Position);
-                    string value = xml.ReadElementContentAsString();
+                    string value = await xml.ReadContentAsStringAsync();
                     writer.Write(value);
                 }
             }

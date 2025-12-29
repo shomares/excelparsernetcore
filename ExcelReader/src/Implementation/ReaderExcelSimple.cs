@@ -11,7 +11,6 @@ namespace ExcelReader.src.Implementation
     public class ReaderExcelSimple : IReaderRow
     {
 
-        private readonly ReaderFileSimple readerFileZip = new();
         private readonly ReadStringsFactory readStringsFactory = new ReadStringsFactory();
         private IReadStrings? readStrings;
         private readonly StreamReaderSheet readerSheet = new();
@@ -64,19 +63,21 @@ namespace ExcelReader.src.Implementation
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
 
-            var indexValues = await readerFileZip.GetFileInfosAsync(zipArchive);
-
-            var stringsFile = indexValues.FirstOrDefault(it => it.PartName == "/xl/sharedStrings.xml") ?? throw new Exception("Shared strings file not found in the Excel archive.");
 
             readStrings = readStringsFactory.CreateReadStrings(fileName);
-            readStrings.LoadInfo(stringsFile, zipArchive);
-            firstSheetPage = indexValues.FirstOrDefault(it => it.PartName == $"/xl/worksheets/{sheetName}.xml") ?? throw new Exception("Shared strings file not found in the Excel archive.");
-
-            if (firstSheetPage == null || string.IsNullOrEmpty(firstSheetPage.PartName))
+            await readStrings.LoadInfoAsync(new FileInfoExcel
             {
-                throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
-            }
+                PartName = "/xl/sharedStrings.xml"
+            }, zipArchive);
+            var indexValues = zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/{sheetName}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
 
+            if (indexValues != null)
+            {
+                firstSheetPage = new FileInfoExcel
+                {
+                    PartName = indexValues.FullName
+                };
+            }
         }
 
         protected virtual void Dispose(bool disposing)

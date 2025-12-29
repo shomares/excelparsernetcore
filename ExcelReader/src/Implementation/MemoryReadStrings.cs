@@ -15,7 +15,12 @@ namespace ExcelReader.src.Implementation
         private List<string>? values = [];
 
 
-        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
+        /// <summary>
+        /// Load the information from the zip archive into memory
+        /// </summary>
+        /// <param name="fileInfoExcel">File info to read</param>
+        /// <param name="zipArchive">Zip archive to read</param>
+        public async Task LoadInfoAsync(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
         {
             var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == fileInfoExcel.PartName?.TrimStart('/'));
 
@@ -31,14 +36,15 @@ namespace ExcelReader.src.Implementation
             using var xml = XmlReader.Create(entryStream, new XmlReaderSettings
             {
                 IgnoreComments = true,
-                IgnoreWhitespace = true
+                Async = true,
+                IgnoreWhitespace = true,
             });
 
             while (xml.Read())
             {
                 if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
                 {
-                    string value = xml.ReadElementContentAsString();
+                    string value = await xml.ReadElementContentAsStringAsync();
                     values.Add(value);
                 }
             }
@@ -73,8 +79,12 @@ namespace ExcelReader.src.Implementation
             GC.SuppressFinalize(this);
         }
 
-   
 
+        /// <summary>
+        /// Get the string by index in memory
+        /// </summary>
+        /// <param name="index">Index to read</param>
+        /// <returns>String to read</returns>
         public string GetStringByIndex(int index)
         {
             return values != null ? values[index] : string.Empty;
