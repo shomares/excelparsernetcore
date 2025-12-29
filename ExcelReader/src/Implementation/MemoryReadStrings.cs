@@ -87,6 +87,16 @@ namespace ExcelReader.src.Implementation
         /// <returns>String to read</returns>
         public string GetStringByIndex(int index)
         {
+            if (values == null)
+            {
+                throw new InvalidOperationException("There is not values parsed");
+
+            }
+            if (index < 0 || index >= values.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is bigger than positions");
+            }
+
             return values != null ? values[index] : string.Empty;
         }
     }

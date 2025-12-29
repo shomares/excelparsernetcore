@@ -94,9 +94,14 @@ namespace ExcelReader.src.Implementation
         public string GetStringByIndex(int index)
         {
 
-            if (entryStream == null || positions == null || positions.Count == 0)
+            if (entryStream == null || positions == null)
             {
                 throw new InvalidOperationException("Stream is not initialized or no positions found.");
+            }
+
+            if (index < 0 || index >= positions.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is bigger than positions");
             }
 
             entryStream.Seek(positions[index], SeekOrigin.Begin);
