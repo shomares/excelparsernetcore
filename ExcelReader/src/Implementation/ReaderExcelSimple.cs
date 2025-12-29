@@ -57,7 +57,6 @@ namespace ExcelReader.src.Implementation
                 index++;
             }
 
-            Console.WriteLine(index);
         }
 
         public async Task ReadFileAsync(string fileName, string sheetName)

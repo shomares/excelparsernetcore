@@ -15,6 +15,35 @@ namespace ExcelReader.src.Implementation
         private List<string>? values = [];
 
 
+        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
+        {
+            var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == fileInfoExcel.PartName?.TrimStart('/'));
+
+            if (entry == null)
+            {
+                return;
+            }
+
+            values = [];
+
+            entryStream = entry.Open();
+
+            using var xml = XmlReader.Create(entryStream, new XmlReaderSettings
+            {
+                IgnoreComments = true,
+                IgnoreWhitespace = true
+            });
+
+            while (xml.Read())
+            {
+                if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
+                {
+                    string value = xml.ReadElementContentAsString();
+                    values.Add(value);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Dispose pattern implementation
@@ -44,34 +73,7 @@ namespace ExcelReader.src.Implementation
             GC.SuppressFinalize(this);
         }
 
-        public void LoadInfo(FileInfoExcel fileInfoExcel, ZipArchive zipArchive)
-        {
-            var entry = zipArchive.Entries.FirstOrDefault(it => it.FullName == fileInfoExcel.PartName?.TrimStart('/'));
-
-            if (entry == null)
-            {
-                return;
-            }
-
-            values = [];
-
-            entryStream = entry.Open();
-         
-            using var xml = XmlReader.Create(entryStream, new XmlReaderSettings
-            {
-                IgnoreComments = true,
-                IgnoreWhitespace = true
-            });
-
-            while (xml.Read())
-            {
-                if (xml.NodeType == XmlNodeType.Element && xml.Name == "t")
-                {
-                    string value = xml.ReadElementContentAsString();
-                    values.Add(value);
-                }
-            }
-        }
+   
 
         public string GetStringByIndex(int index)
         {

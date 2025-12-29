@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml;
 
 
 namespace ExcelReader.src.Implementation
@@ -35,41 +36,15 @@ namespace ExcelReader.src.Implementation
         /// </summary>
         /// <param name="bytes">A stream to read</param>
         /// <returns>Dictionary of read parameters parsed</returns>
-        public static Dictionary<string, string> ReadParameters(this StreamReader bytes)
+        public static Dictionary<string, string> ReadParameters(this XmlReader bytes)
         {
             var parameters = new Dictionary<string, string>(5);
-            char? c = null;
-            while (!bytes.EndOfStream && c != '>')
+
+            for (var index = 0; index < bytes.AttributeCount; index++)
             {
-                var parameterName = new StringBuilder();
-                var parameterValue = new StringBuilder();
-                c = (char)bytes.Read();
+                bytes.MoveToAttribute(index);
+                parameters.Add(bytes.Name, bytes.Value);
 
-                if (c == '>')
-                {
-                    break;
-                }
-
-                while (!bytes.EndOfStream && c != '=')
-                {
-                    if (c != ' ')
-                    {
-                        parameterName.Append(c);
-                    }
-
-                    c = (char)bytes.Read();
-                }
-
-                c = (char)bytes.Read();
-                c = (char)bytes.Read();
-
-                while (!bytes.EndOfStream && c != '"')
-                {
-                    parameterValue.Append(c);
-                    c = (char)bytes.Read();
-                }
-
-                parameters[parameterName.ToString()] = parameterValue.ToString();
             }
 
             return parameters;
