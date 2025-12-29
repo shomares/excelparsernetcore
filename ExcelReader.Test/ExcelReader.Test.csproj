@@ -32,6 +32,12 @@
     <None Update="Files\bigstring.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Files\corrupted.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\corruptedshared.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Files\numbers.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
