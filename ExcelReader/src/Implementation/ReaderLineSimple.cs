@@ -2,7 +2,6 @@
 using ExcelReader.src.Interfaces;
 using System.Dynamic;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace ExcelReader.src.Implementation
