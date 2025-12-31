@@ -1,4 +1,5 @@
-﻿using ExcelReader.src.Entity;
+﻿using ExcelReader.src.Config;
+using ExcelReader.src.Entity;
 using ExcelReader.src.Interfaces;
 using System.IO.Compression;
 
@@ -64,14 +65,14 @@ namespace ExcelReader.src.Implementation
 
         }
 
-        public async Task ReadFileAsync(string fileName, string sheetName)
+        public async Task ReadFileAsync(string fileName, string sheetName, ConfigurationReader? configuration = null)
         {
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
 
             readerStyles = new ReaderStyles();
 
-            readStrings = readStringsFactory.CreateReadStrings(fileName);
+            readStrings = readStringsFactory.CreateReadStrings(fileName, configuration);
             await readStrings.LoadInfoAsync(new FileInfoExcel
             {
                 PartName = "/xl/sharedStrings.xml"

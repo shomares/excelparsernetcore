@@ -6,15 +6,16 @@ using System.Text.Json;
 using var simple = new ReaderExcelSimple();
 
 Stopwatch stopwatch = Stopwatch.StartNew();
-await simple.ReadFileAsync("Example.xlsx", "sheet1");
-var result = simple.GetNextRow();
+await simple.ReadFileAsync("Example.xlsx", "sheet1", new ExcelReader.src.Config.ConfigurationReader
+{
+    UseMemoryForStrings = false
+});
 
 
-
-foreach (var item in result)
+foreach (var item in simple.GetNextRow())
 {
 
-    Console.WriteLine(JsonSerializer.Serialize(item));
+   Console.WriteLine(JsonSerializer.Serialize(item));
 }
 
 stopwatch.Stop();
