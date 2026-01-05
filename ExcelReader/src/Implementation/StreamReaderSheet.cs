@@ -1,8 +1,6 @@
 ﻿using ExcelReader.src.Entity;
 using ExcelReader.src.Interfaces;
 using System.IO.Compression;
-using System.Reflection.PortableExecutable;
-using System.Text;
 using System.Xml;
 
 namespace ExcelReader.src.Implementation
