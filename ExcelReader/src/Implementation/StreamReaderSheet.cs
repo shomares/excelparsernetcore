@@ -1,6 +1,7 @@
 ﻿using ExcelReader.src.Entity;
 using ExcelReader.src.Interfaces;
 using System.IO.Compression;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Xml;
 
@@ -41,7 +42,7 @@ namespace ExcelReader.src.Implementation
         private static IEnumerable<FileRowInfoExcel> ParseContent(StreamReader bytes)
         {
 
-            using var xml = XmlReader.Create(bytes, new XmlReaderSettings
+            using var reader = XmlReader.Create(bytes, new XmlReaderSettings
             {
                 IgnoreComments = true,
                 IgnoreWhitespace = true
@@ -49,49 +50,54 @@ namespace ExcelReader.src.Implementation
 
 
 
-            var currentElement = new StringBuilder();
-            FileRowInfoExcel? rowInfo = null;
-
-            while (xml.Read())
+            while (reader.Read())
             {
-                if (xml.NodeType == XmlNodeType.Element && xml.Name == "row")
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "row")
                 {
+                    var row = new FileRowInfoExcel();
 
-                    rowInfo = new FileRowInfoExcel
+                    while (reader.Read())
                     {
-                        Parameters = ReaderValues.ReadParameters(xml),
-                        Columns = ReadColumns(xml)
-                    };
-                    yield return rowInfo;
+                        if (reader.Name == "c" && reader.NodeType == XmlNodeType.Element)
+                        {
+                            string cellRef = reader.GetAttribute("r"); // A1, B1, D1
+                            string cellType = reader.GetAttribute("t"); // s, n, b, etc.
+
+                            row.Columns.Add(new FileColumnInfoExcel
+                            {
+                                Parameters = new Dictionary<string, string>()
+                                {
+                                    {
+                                        "r", cellRef
+                                    },
+                                    {   "t", cellType }
+                                }
+                            });
+                        }
+
+                        if (reader.Name == "v" && reader.NodeType == XmlNodeType.Element)
+                        {
+                            row.Columns[^1].V = reader.ReadElementContentAsString();
+                        }
+
+                        if (reader.Name == "row" && reader.NodeType == XmlNodeType.EndElement)
+                        {
+                            break;
+                        }
+
+                    }
+
+                    yield return row;
+
                 }
+
+
             }
+
+
 
         }
 
-        private static List<FileColumnInfoExcel> ReadColumns(XmlReader xml)
-        {
-            var columns = new List<FileColumnInfoExcel>();
-            while (xml.Read() && xml.NodeType == XmlNodeType.Element && xml.Name == "c")
-            {
-                FileColumnInfoExcel columnInfo = new()
-                {
-                    Parameters = ReaderValues.ReadParameters(xml)
-                };
-
-
-                xml.Read();
-                if (!xml.IsEmptyElement
-                    && xml.NodeType == XmlNodeType.Element && xml.Name == "v")
-                {
-                    columnInfo.V = xml.ReadElementContentAsString();
-                }
-
-                columns.Add(columnInfo);
-
-            }
-
-            return columns;
-        }
 
 
 

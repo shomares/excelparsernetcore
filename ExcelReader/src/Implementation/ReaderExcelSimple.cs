@@ -12,7 +12,7 @@ namespace ExcelReader.src.Implementation
     public class ReaderExcelSimple : IReaderRow
     {
 
-        private readonly ReadStringsFactory readStringsFactory = new ReadStringsFactory();
+        private readonly ReadStringsFactory readStringsFactory = new();
         private IReadStrings? readStrings;
         private readonly StreamReaderSheet readerSheet = new();
         private bool disposedValue;

@@ -125,14 +125,19 @@ namespace ExcelReader.src.Implementation
                        : string.Empty;
 
                 r = GetColumnName(r);
+#pragma warning disable CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
+                var dict = (IDictionary<string, object?>)result;
+#pragma warning restore CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
+                var value = GetValue(column);
+
 
                 if (columns.TryGetValue(r, out var columnsPropertyName))
                 {
-#pragma warning disable CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
-                    var dict = (IDictionary<string, object?>)result;
-#pragma warning restore CS8619 // La nulabilidad de los tipos de referencia del valor no coincide con el tipo de destino
-                    var value = GetValue(column);
                     dict.Add(columnsPropertyName, value ?? string.Empty);
+                }
+                else
+                {
+                    dict.Add(r, value ?? string.Empty);
                 }
             }
 
