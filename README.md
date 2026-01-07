@@ -25,7 +25,7 @@ This library reads Excel files directly from their underlying XML structure and 
 Clone the repository or reference the project directly:
 
 ```bash
-git clone [https://github.com/your-org/streaming-excel-reader.git](https://github.com/shomares/excelparsernetcore/tree/master)
+git clone https://github.com/shomares/excelparsernetcore/tree/master
 ```
 
 ## 🚀 Basic Usage
