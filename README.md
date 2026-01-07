@@ -118,6 +118,11 @@ CSV / Excel migrations
 Processing files larger than available RAM
 
 
+## 📄 License
+
+MIT License
+
+
 
 
 
