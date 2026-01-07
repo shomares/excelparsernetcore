@@ -20,9 +20,15 @@ namespace ExcelReader.src.Implementation
         private ZipArchive? zipArchive;
         private FileStream? fileStream;
         private ReaderStyles? readerStyles;
+        private ConfigurationReader? _configuration = null;
 
         public IEnumerable<dynamic> GetNextRow()
         {
+            if (_configuration == null)
+            {
+                throw new Exception("Configuration is not initialized. You must call ReadFileAsync before reading rows.");
+            }
+
             if (firstSheetPage == null || zipArchive == null || firstSheetPage.PartName == null)
             {
                 throw new Exception("You must call ReadFileAsync before reading rows.");
@@ -42,21 +48,16 @@ namespace ExcelReader.src.Implementation
 
             var readerRow = new ReaderLineSimple(readStrings, readerStyles);
             var values = readerSheet.ReadSheet(firstSheetPage.PartName, zipArchive);
-            IDictionary<string, string>? columns = null;
-
+            IDictionary<string, string> columns = new Dictionary<string, string>();
             foreach (var row in values)
             {
-                if (index == 0)
+                if (index == 0 && _configuration.HasHeaders)
                 {
                     columns = readerRow.ReadColumns(row);
                     index++;
                     continue;
                 }
 
-                if (columns == null)
-                {
-                    break;
-                }
 
                 var toYield = readerRow.ReadRow(row, columns);
                 yield return toYield;
@@ -71,6 +72,11 @@ namespace ExcelReader.src.Implementation
             zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
 
             readerStyles = new ReaderStyles();
+            _configuration = configuration ?? new ConfigurationReader
+            {
+                HasHeaders = true,
+                UseMemoryForStrings = false
+            };
 
             readStrings = readStringsFactory.CreateReadStrings(fileName, configuration);
             await readStrings.LoadInfoAsync(new FileInfoExcel

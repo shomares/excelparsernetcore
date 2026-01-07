@@ -32,7 +32,7 @@ namespace ExcelReader.src.Implementation
                 }
                 else
                 {
-                    columns.Add(r, value.ToString() ?? r);
+                    columns.Add(r, value.ToString().Replace(' ', '_') ?? r);
                 }
 
             }
@@ -43,11 +43,6 @@ namespace ExcelReader.src.Implementation
         private object? GetValue(FileColumnInfoExcel column)
         {
             if (column.V == null)
-            {
-                return null;
-            }
-
-            if (column.V == "NULL" || column.V == "null")
             {
                 return null;
             }
@@ -66,11 +61,11 @@ namespace ExcelReader.src.Implementation
                 }
                 else if (typeValue == "n")
                 {
-                    return decimal.Parse(column.V);
+                    return decimal.Parse(column.V, CultureInfo.InvariantCulture);
                 }
             }
 
-            else if (column.Parameters.TryGetValue("s", out var style) && int.TryParse(style, out var indexS))
+            if (column.Parameters.TryGetValue("s", out var style) && int.TryParse(style, out var indexS))
             {
                 var styleA = readerStyles.GetCellStyle(indexS);
                 double oaDate = double.Parse(column.V, CultureInfo.InvariantCulture);
@@ -81,6 +76,11 @@ namespace ExcelReader.src.Implementation
                 }
 
                 return oaDate;
+            }
+
+            if (decimal.TryParse(column.V, CultureInfo.InvariantCulture, out var s))
+            {
+                return s;
             }
 
             return column.V;

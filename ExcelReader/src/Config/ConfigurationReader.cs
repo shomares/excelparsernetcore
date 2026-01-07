@@ -11,5 +11,11 @@ namespace ExcelReader.src.Config
         /// true to use memory implementation for files small, false to use stream implementation
         /// </summary>
         public bool UseMemoryForStrings { get; set; } = true;
+
+
+        /// <summary>
+        /// Specify if the first row contains headers
+        /// </summary>
+        public bool HasHeaders { get; set; } = true;
     }
 }

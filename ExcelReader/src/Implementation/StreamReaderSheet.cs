@@ -60,6 +60,7 @@ namespace ExcelReader.src.Implementation
                         {
                             string cellRef = reader.GetAttribute("r"); // A1, B1, D1
                             string cellType = reader.GetAttribute("t"); // s, n, b, etc.
+                            string cellStyle = reader.GetAttribute("s"); // style index
 
                             row.Columns.Add(new FileColumnInfoExcel
                             {
@@ -68,7 +69,9 @@ namespace ExcelReader.src.Implementation
                                     {
                                         "r", cellRef
                                     },
-                                    {   "t", cellType }
+                                    {   "t", cellType },
+                                    {   "s", cellStyle??string.Empty }
+
                                 }
                             });
                         }
