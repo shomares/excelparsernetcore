@@ -26,22 +26,22 @@ namespace ExcelReader.src.Implementation
         {
             if (_configuration == null)
             {
-                throw new Exception("Configuration is not initialized. You must call ReadFileAsync before reading rows.");
+                throw new InvalidOperationException("Configuration is not initialized. You must call ReadFileAsync before reading rows.");
             }
 
             if (zipArchive == null)
             {
-                throw new Exception("You must call ReadFileAsync before reading rows.");
+                throw new InvalidOperationException("You must call ReadFileAsync before reading rows.");
             }
 
             if (readStrings == null)
             {
-                throw new Exception("ReadStrings is not initialized. You must call ReadFileAsync before reading rows.");
+                throw new InvalidOperationException("ReadStrings is not initialized. You must call ReadFileAsync before reading rows.");
             }
 
             if (readerStyles == null)
             {
-                throw new Exception("ReaderStyles is not initialized. You must call ReadFileAsync before reading rows.");
+                throw new InvalidOperationException("ReaderStyles is not initialized. You must call ReadFileAsync before reading rows.");
             }
 
 

@@ -32,7 +32,7 @@ namespace ExcelReader.src.Implementation
                 }
                 else
                 {
-                    columns.Add(r, value.ToString().Replace(' ', '_') ?? r);
+                    columns.Add(r, value.ToString()?.Replace(' ', '_') ?? r);
                 }
 
             }
