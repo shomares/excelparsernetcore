@@ -44,7 +44,7 @@ await reader.ReadFileAsync(
     }
 );
 
-foreach (var row in reader.GetNextRow())
+foreach (var row in reader.GetNextRow( "sheet1",))
 {
     Console.WriteLine(row.ip_address);
 }
@@ -69,7 +69,7 @@ Avoid calling .ToList(), .GroupBy(), or other materializing operations if you wa
 int count = 0;
 dynamic? firstRow = null;
 
-foreach (var row in reader.GetNextRow())
+foreach (var row in reader.GetNextRow("sheet1"))
 {
     if (count == 0)
         firstRow = row;

@@ -22,14 +22,14 @@ namespace ExcelReader.src.Implementation
         private ReaderStyles? readerStyles;
         private ConfigurationReader? _configuration = null;
 
-        public IEnumerable<dynamic> GetNextRow()
+        public IEnumerable<dynamic> GetNextRow(string sheetName)
         {
             if (_configuration == null)
             {
                 throw new Exception("Configuration is not initialized. You must call ReadFileAsync before reading rows.");
             }
 
-            if (firstSheetPage == null || zipArchive == null || firstSheetPage.PartName == null)
+            if (zipArchive == null)
             {
                 throw new Exception("You must call ReadFileAsync before reading rows.");
             }
@@ -43,6 +43,13 @@ namespace ExcelReader.src.Implementation
             {
                 throw new Exception("ReaderStyles is not initialized. You must call ReadFileAsync before reading rows.");
             }
+
+
+            var indexValues = (zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/{sheetName}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.")) ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
+            firstSheetPage = new FileInfoExcel
+            {
+                PartName = indexValues.FullName
+            };
 
             long index = 0;
 
@@ -66,7 +73,7 @@ namespace ExcelReader.src.Implementation
 
         }
 
-        public async Task ReadFileAsync(string fileName, string sheetName, ConfigurationReader? configuration = null)
+        public async Task ReadFileAsync(string fileName, ConfigurationReader? configuration = null)
         {
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read);
@@ -86,15 +93,6 @@ namespace ExcelReader.src.Implementation
 
 
             readerStyles.LoadInfo(zipArchive);
-            var indexValues = zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/{sheetName}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
-
-            if (indexValues != null)
-            {
-                firstSheetPage = new FileInfoExcel
-                {
-                    PartName = indexValues.FullName
-                };
-            }
         }
 
         protected virtual void Dispose(bool disposing)

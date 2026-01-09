@@ -8,9 +8,9 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simpletwo.xlsx", "sheet1");
+            await implementation.ReadFileAsync("Files/simpletwo.xlsx");
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet1").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(2));
             dynamic firstRow = rows[0];
@@ -27,9 +27,9 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/missingcolumns.xlsx", "sheet1");
+            await implementation.ReadFileAsync("Files/missingcolumns.xlsx");
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet1").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(3));
             dynamic firstRow = rows[0];
@@ -49,9 +49,9 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simple.xlsx", "sheet2");
+            await implementation.ReadFileAsync("Files/simple.xlsx");
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet2").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(3));
             dynamic firstRow = rows[0];
@@ -70,13 +70,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simple.xlsx", "sheet4", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = false,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet4").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(3));
             dynamic firstRow = rows[0];
@@ -91,13 +91,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/numbers.xlsx", "sheet1", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/numbers.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = false,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet1").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(4));
             dynamic firstRow = rows[0];
@@ -112,13 +112,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simple.xlsx", "sheet5", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet5").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(4));
             dynamic firstRow = rows[0];
@@ -133,13 +133,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simple.xlsx", "sheet6", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet6").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(4));
             dynamic firstRow = rows[0];
@@ -154,13 +154,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/simple.xlsx", "sheet7", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet7").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(4));
             dynamic firstRow = rows[0];
@@ -181,13 +181,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/bigfile.xlsx", "sheet1", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = false
             });
             // Act
-            var rows = implementation.GetNextRow().ToList();
+            var rows = implementation.GetNextRow("sheet1").ToList();
             // Assert
             Assert.That(rows.Count, Is.EqualTo(1000020));
             dynamic firstRow = rows[0];
@@ -199,13 +199,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/bigfile.xlsx", "sheet1", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow().
+            var rows = implementation.GetNextRow("sheet1").
                 Where(r => r.gender == "Male")
                 .ToList();
             // Assert
@@ -219,13 +219,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/bigfile.xlsx", "sheet1", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow()
+            var rows = implementation.GetNextRow("sheet1")
                 .Take(20)
                 .ToList();
             // Assert
@@ -238,13 +238,13 @@
         {
             // Arrange
             var implementation = new src.Implementation.ReaderExcelSimple();
-            await implementation.ReadFileAsync("Files/bigfile.xlsx", "sheet1", new src.Config.ConfigurationReader
+            await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
                 UseMemoryForStrings = true
             });
             // Act
-            var rows = implementation.GetNextRow()
+            var rows = implementation.GetNextRow("sheet1")
                  .GroupBy(it => it.gender)
                  .Select(it => new
                  {

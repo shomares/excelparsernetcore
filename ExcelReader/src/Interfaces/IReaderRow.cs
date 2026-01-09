@@ -4,8 +4,8 @@ namespace ExcelReader.src.Interfaces
 {
     internal interface IReaderRow : IDisposable
     {
-        IEnumerable<dynamic> GetNextRow();
+        IEnumerable<dynamic> GetNextRow(string sheetName);
 
-        Task ReadFileAsync(string fileName, string sheetName, ConfigurationReader? configuration = null);
+        Task ReadFileAsync(string fileName, ConfigurationReader? configuration = null);
     }
 }
