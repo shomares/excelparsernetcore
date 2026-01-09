@@ -36,7 +36,6 @@ var reader = new ReaderExcelSimple();
 
 await reader.ReadFileAsync(
     "Files/bigfile.xlsx",
-    "sheet1",
     new ConfigurationReader
     {
         HasHeaders = true,
@@ -44,7 +43,7 @@ await reader.ReadFileAsync(
     }
 );
 
-foreach (var row in reader.GetNextRow( "sheet1",))
+foreach (var row in reader.GetNextRow( "sheet1"))
 {
     Console.WriteLine(row.ip_address);
 }
