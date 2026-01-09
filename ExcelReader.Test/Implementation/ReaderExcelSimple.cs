@@ -7,7 +7,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileAsync()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simpletwo.xlsx");
             // Act
             var rows = implementation.GetNextRow("sheet1").ToList();
@@ -26,7 +26,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileMissingColumnsAsync()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/missingcolumns.xlsx");
             // Act
             var rows = implementation.GetNextRow("sheet1").ToList();
@@ -48,7 +48,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileSecondPage()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simple.xlsx");
             // Act
             var rows = implementation.GetNextRow("sheet2").ToList();
@@ -69,7 +69,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileWithNoColumsn()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = false,
@@ -90,7 +90,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileWithNumbers()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/numbers.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = false,
@@ -111,7 +111,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileWithDate()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -132,7 +132,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileWithDateAsTable()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -153,7 +153,7 @@
         public async Task ReaderExcelSimple_ReadSimpleFileWithDateAsFormula()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simple.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -180,7 +180,7 @@
         public async Task ReaderExcelSimple_ReadBigFile()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -198,7 +198,7 @@
         public async Task ReaderExcelSimple_ReadBigFileWithLinq()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -218,7 +218,7 @@
         public async Task ReaderExcelSimple_ReadBigFileWithLinqOnly20()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -237,7 +237,7 @@
         public async Task ReaderExcelSimple_ReadBigFileWithLinqGroupBy()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/bigfile.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
@@ -261,7 +261,7 @@
         public async Task ReaderExcelSimple_ReadSheetTwoByName()
         {
             // Arrange
-            var implementation = new src.Implementation.ReaderExcelSimple();
+            using var implementation = new src.Implementation.ReaderExcelSimple();
             await implementation.ReadFileAsync("Files/simpleSpecial.xlsx", new src.Config.ConfigurationReader
             {
                 HasHeaders = true,
