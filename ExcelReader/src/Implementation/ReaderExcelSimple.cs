@@ -52,7 +52,7 @@ namespace ExcelReader.src.Implementation
 
             if(string.IsNullOrEmpty(name))
             {
-                throw new Exception($"Sheet with id {sheetName} not found in the workbook.");
+                throw new InvalidOperationException($"Sheet with id {sheetName} not found in the workbook.");
             }
 
             var indexValues = (zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/sheet{name}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.")) ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
