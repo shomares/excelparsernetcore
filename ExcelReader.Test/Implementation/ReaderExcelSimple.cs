@@ -257,5 +257,38 @@
          
         }
 
+        [Test]
+        public async Task ReaderExcelSimple_ReadSheetTwoByName()
+        {
+            // Arrange
+            var implementation = new src.Implementation.ReaderExcelSimple();
+            await implementation.ReadFileAsync("Files/simpleSpecial.xlsx", new src.Config.ConfigurationReader
+            {
+                HasHeaders = true,
+                UseMemoryForStrings = true
+            });
+            // Act
+            var index =0;
+
+            foreach(var item in implementation.GetNextRow("Countries"))
+            {
+                if(index == 0)
+                {
+                    Assert.That(item.Country, Is.EqualTo("India"));
+                    Assert.That(item.Population, Is.EqualTo(1463865525));
+                }
+                else if(index ==1)
+                {
+                    Assert.That(item.Country, Is.EqualTo("China"));
+                    Assert.That(item.Population, Is.EqualTo(1416096094));
+                }
+                index++;
+            }
+
+       
+            // Assert
+            Assert.That(index, Is.EqualTo(10));
+        }
+
     }
 }

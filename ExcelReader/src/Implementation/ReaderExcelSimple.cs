@@ -15,6 +15,9 @@ namespace ExcelReader.src.Implementation
         private readonly ReadStringsFactory readStringsFactory = new();
         private IReadStrings? readStrings;
         private readonly StreamReaderSheet readerSheet = new();
+
+        private readonly WorkbookSheetReader readerWorkbookSheet = new ();
+
         private bool disposedValue;
         private FileInfoExcel? firstSheetPage;
         private ZipArchive? zipArchive;
@@ -45,7 +48,14 @@ namespace ExcelReader.src.Implementation
             }
 
 
-            var indexValues = (zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/{sheetName}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.")) ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
+            var name = readerWorkbookSheet.GetSheetNameById(sheetName);
+
+            if(string.IsNullOrEmpty(name))
+            {
+                throw new Exception($"Sheet with id {sheetName} not found in the workbook.");
+            }
+
+            var indexValues = (zipArchive.Entries.First(it => it.FullName == $"xl/worksheets/sheet{name}.xml") ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.")) ?? throw new Exception($"Sheet {sheetName} not found in the Excel archive.");
             firstSheetPage = new FileInfoExcel
             {
                 PartName = indexValues.FullName
@@ -93,6 +103,7 @@ namespace ExcelReader.src.Implementation
 
 
             readerStyles.LoadInfo(zipArchive);
+            readerWorkbookSheet.LoadInfo(zipArchive);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -107,6 +118,7 @@ namespace ExcelReader.src.Implementation
                     readerSheet.Dispose();
                     zipArchive?.Dispose();
                     fileStream?.Dispose();
+                    readerWorkbookSheet.Dispose();
                 }
 
                 disposedValue = true;
